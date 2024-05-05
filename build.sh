@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # readlink -f cannot work on mac
 TOPDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -9,7 +10,7 @@ CMAKE_COMMAND="cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 --log-level=STATUS"
 
 ALL_ARGS=("$@")
 BUILD_ARGS=()
-MAKE_ARGS=()
+MAKE_ARGS=(-j12 )
 MAKE=make
 
 echo "$0 ${ALL_ARGS[@]}"
@@ -80,8 +81,8 @@ function do_init
   cd ${TOPDIR}/deps/3rd/libevent && \
     mkdir -p build && \
     cd build && \
-    ${CMAKE_COMMAND} .. -DEVENT__DISABLE_OPENSSL=ON -DEVENT__LIBRARY_TYPE=BOTH && \
-    ${MAKE_COMMAND} -j4 && \
+    ${CMAKE_COMMAND} .. -DEVENT__DISABLE_OPENSSL=ON -DEVENT__LIBRARY_TYPE=BOTH -DCMAKE_EXPORT_COMPILE_COMMANDS=1 && \
+    ${MAKE_COMMAND} -j16 && \
     make install
 
   # build googletest
@@ -97,7 +98,7 @@ function do_init
     mkdir -p build && \
     cd build && \
     ${CMAKE_COMMAND} .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBENCHMARK_ENABLE_TESTING=OFF  -DBENCHMARK_INSTALL_DOCS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_USE_BUNDLED_GTEST=OFF -DBENCHMARK_ENABLE_ASSEMBLY_TESTS=OFF && \
-    ${MAKE_COMMAND} -j4 && \
+    ${MAKE_COMMAND} -j16 && \
     ${MAKE_COMMAND} install
 
   # build jsoncpp
@@ -105,7 +106,7 @@ function do_init
     mkdir -p build && \
     cd build && \
     ${CMAKE_COMMAND} -DJSONCPP_WITH_TESTS=OFF -DJSONCPP_WITH_POST_BUILD_UNITTEST=OFF .. && \
-    ${MAKE_COMMAND} && \
+    ${MAKE_COMMAND} -j16 && \
     ${MAKE_COMMAND} install
 
   cd $current_dir

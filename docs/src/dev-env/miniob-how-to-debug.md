@@ -88,7 +88,7 @@ LOG_CONSOLE_LEVEL=1
 
 1. Attach进程
 
-    ```
+    ```bash
     [caizj@localhost run]$ gdb -p `pidof observer` 
     
     GNU gdb (GDB) Red Hat Enterprise Linux 8.2-15.el8 Copyright (C) 2018 Free Software Foundation, Inc.
@@ -98,7 +98,7 @@ LOG_CONSOLE_LEVEL=1
 
 2. 设置断点
 
-    ```
+    ```bash
     (gdb) break do_select
     Breakpoint 1 at 0x44b636: file /home/caizj/source/stunning-engine/src/observer/sql/executor/execute_stage.cpp, line 526.
     (gdb) info b
@@ -107,7 +107,7 @@ LOG_CONSOLE_LEVEL=1
                                                        at /home/caizj/source/stunning-engine/src/observer/sql/executor/execute_stage.cpp:526
     ```
 
-    ```
+    ```cpp
     (gdb) break Table::scan_record
     Breakpoint 2 at 0x50b82b: Table::scan_record. (2 locations)
     (gdb) inf b
