@@ -16,9 +16,10 @@ See the Mulan PSL v2 for more details. */
 #include "common/lang/comparator.h"
 #include "common/lang/string.h"
 #include "common/log/log.h"
+#include <cstdio>
 #include <sstream>
 
-const char *ATTR_TYPE_NAME[] = {"undefined", "chars", "ints", "floats", "booleans"};
+const char *ATTR_TYPE_NAME[] = {"undefined", "chars", "ints", "floats", "booleans", "dates"};
 
 const char *attr_type_to_string(AttrType type)
 {
@@ -114,6 +115,12 @@ void Value::set_value(const Value &value)
     case BOOLEANS: {
       set_boolean(value.get_boolean());
     } break;
+    case DATES: {
+      int value = num_value_.int_value_;
+      char buf[16] = {0};
+      snprintf(buf, sizeof(buf), "%04d-%02d-%02d", value/10000, (value%10000)/100, value%100); 
+      set_string(buf, strlen(buf));
+    } break;
     case UNDEFINED: {
       ASSERT(false, "got an invalid value type");
     } break;
@@ -146,6 +153,9 @@ std::string Value::to_string() const
       os << num_value_.bool_value_;
     } break;
     case CHARS: {
+      os << str_value_;
+    } break;
+    case DATES: {
       os << str_value_;
     } break;
     default: {

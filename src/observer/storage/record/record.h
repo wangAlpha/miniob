@@ -17,13 +17,10 @@ See the Mulan PSL v2 for more details. */
 #include <limits>
 #include <sstream>
 #include <stddef.h>
-#include <vector>
 
 #include "common/log/log.h"
 #include "common/rc.h"
 #include "common/types.h"
-#include "storage/field/field_meta.h"
-#include "storage/index/index_meta.h"
 
 class Field;
 

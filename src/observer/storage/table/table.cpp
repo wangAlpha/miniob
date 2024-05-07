@@ -15,6 +15,7 @@ See the Mulan PSL v2 for more details. */
 #include <algorithm>
 #include <limits.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "common/defs.h"
 #include "common/lang/string.h"
@@ -124,6 +125,41 @@ RC Table::create(Db *db, int32_t table_id, const char *path, const char *name, c
   }
 
   LOG_INFO("Successfully create table %s:%s", base_dir, name);
+  return rc;
+}
+
+RC Table::destroy() {
+  LOG_INFO("Begin to destory table %s:%s", name());
+  RC rc = RC::SUCCESS;
+  rc = sync();
+
+  std::string path = table_meta_file(base_dir_.c_str(), table_meta_.name());
+  if (::unlink(path.c_str()) != 0) {
+    LOG_WARN("Failed to remove table %s meta file=%s, errno=%d",
+             table_meta_.name(), path.c_str(), errno);
+    return RC::FILE_NOT_EXIST;
+  }
+
+  std::string data_file =
+      table_data_file(base_dir_.c_str(), table_meta_.name());
+  if (::unlink(data_file.c_str()) != 0) {
+    LOG_WARN("Failed to remove table %s data file=%s, errno=%d",
+             table_meta_.name(), path.c_str(), errno);
+    return RC::FILE_NOT_EXIST;
+  }
+
+  const int index_num = table_meta_.index_num();
+  for (int i = 0; i < index_num; ++i) {
+    BplusTreeIndex *index = (BplusTreeIndex *)indexes_[i];
+    index->close();
+    std::string index_file =
+        table_index_file(base_dir_.c_str(), name(), index->index_meta().name());
+    if (::unlink(index_file.c_str()) != 0) {
+      LOG_WARN("Failed to remove table %s index file=%s, errno=%d",
+               table_meta_.name(), index_file.c_str(), errno);
+      return RC::INTERNAL;
+    }
+  }
   return rc;
 }
 
